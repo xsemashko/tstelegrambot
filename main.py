@@ -15,7 +15,7 @@ def welcome(message):
 # keyboard
     markup = types.ReplyKeyboardMarkup(row_width=2)
     item1 = types.KeyboardButton("Прошивки")
-    item2 = types.KeyboardButton("Спецификации")
+    item2 = types.KeyboardButton("Техническая документация")
     item3 = types.KeyboardButton("Программы и утилиты")
     item4 = types.KeyboardButton("Приложения и кинотеатры")
     item5 = types.KeyboardButton("Удаленное управлене")
@@ -68,6 +68,22 @@ def redboxvendor(message):
     markup.add(item1, item2, item3)
     
     bot.send_message(message.chat.id, "Выберите модель устройства:", reply_markup=markup)
+    pass
+
+
+@bot.message_handler(regexp="^Техническая документация$")
+def techdoc(message):
+
+# keyboard
+    markup = types.ReplyKeyboardMarkup(row_width=1)
+    item1 = types.KeyboardButton("IPTV приставки")
+    item2 = types.KeyboardButton("Обновление и перепрошивка")
+    item3 = types.KeyboardButton("Презентации и промо")
+    item4 = types.KeyboardButton("Назад в гл.меню")
+
+    markup.add(item1, item2, item3, item4)
+
+    bot.send_message(message.chat.id, "Выберите интересующую категорию", reply_markup=markup)
     pass
 
 @bot.message_handler(regexp="^Назад")
