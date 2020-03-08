@@ -49,11 +49,25 @@ def portalsandplatforms(message):
 # keyboard
     markup = types.ReplyKeyboardMarkup(row_width=1)
     item1 = types.KeyboardButton("Redbox")
-    item2 = types.KeyboardButton("Назад в Порталы и платформы")
+    item2 = types.KeyboardButton("Назад в прошивки")
 
     markup.add(item1, item2)
     
     bot.send_message(message.chat.id, "Выберите производителя:", reply_markup=markup)
+    pass
+
+@bot.message_handler(regexp="^Redbox$")
+def redboxvendor(message):
+
+# keyboard
+    markup = types.ReplyKeyboardMarkup(row_width=1)
+    item1 = types.KeyboardButton("Redbox Mini 3L")
+    item2 = types.KeyboardButton("Redbox Mini 5PRO")
+    item3 = types.KeyboardButton("Назад в Порталы и платформы")
+
+    markup.add(item1, item2, item3)
+    
+    bot.send_message(message.chat.id, "Выберите модель устройства:", reply_markup=markup)
     pass
 
 @bot.message_handler(regexp="^Назад")
@@ -61,9 +75,10 @@ def backfunction(message):
 
     if message.text == 'Назад в гл.меню':
         welcome(message)
-
-    if message.text == 'Назад в Порталы и платформы':
+    if message.text == 'Назад в прошивки':
         software(message)
+    if message.text == 'Назад в Порталы и платформы':
+        portalsandplatforms(message)
     pass
 
 # RUN
