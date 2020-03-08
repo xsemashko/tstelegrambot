@@ -27,5 +27,44 @@ def welcome(message):
 
     bot.send_message(message.chat.id, "Выберите интересующий Вас раздел:", reply_markup=markup)
 
+@bot.message_handler(regexp="^Прошивки$")
+def software(message):
+
+# keyboard
+    markup1 = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("Порталы и платформы")
+    item2 = types.KeyboardButton("Прошивки для операторов")
+    item3 = types.KeyboardButton("Стоковая прошивка")
+    item4 = types.KeyboardButton("Кастомизация")
+    item5 = types.KeyboardButton("Назад в гл.меню")
+
+    markup1.add(item1, item2, item3, item4, item5)
+
+    bot.send_message(message.chat.id, "Выберите интересующую категорию", reply_markup=markup1)
+    pass
+
+@bot.message_handler(regexp="^Порталы и платформы$")
+def portalsandplatforms(message):
+
+# keyboard
+    markup = types.ReplyKeyboardMarkup(row_width=1)
+    item1 = types.KeyboardButton("Redbox")
+    item2 = types.KeyboardButton("Назад в Порталы и платформы")
+
+    markup.add(item1, item2)
+    
+    bot.send_message(message.chat.id, "Выберите производителя:", reply_markup=markup)
+    pass
+
+@bot.message_handler(regexp="^Назад")
+def backfunction(message):
+
+    if message.text == 'Назад в гл.меню':
+        welcome(message)
+
+    if message.text == 'Назад в Порталы и платформы':
+        software(message)
+    pass
+
 # RUN
 bot.polling(none_stop=True)
