@@ -11,7 +11,8 @@ bot = telebot.TeleBot(config.TOKEN)
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
-
+    FILEID = 'BAACAgIAAxkDAAIBxl5lH2r1r05dKYn6CzQlrGMZVmvkAAIrBwAC81coSwEmYV_wTwp4GAQ'
+    
 # keyboard
     markup = types.ReplyKeyboardMarkup(row_width=2)
     item1 = types.KeyboardButton("Прошивки")
@@ -24,8 +25,9 @@ def welcome(message):
     item8 = types.KeyboardButton("Тестирование")
 
     markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
-
-    bot.send_message(message.chat.id, "Выберите интересующий Вас раздел:", reply_markup=markup)
+    
+    bot.send_video(message.chat.id, FILEID, reply_markup=markup)
+    #bot.send_message(message.chat.id, "Выберите интересующий Вас раздел:", reply_markup=markup)
 
 @bot.message_handler(regexp="^Прошивки$")
 def software(message):
