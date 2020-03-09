@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import telebot
@@ -88,6 +88,39 @@ def techdoc(message):
     bot.send_message(message.chat.id, "Выберите интересующую категорию", reply_markup=markup)
     pass
 
+@bot.message_handler(regexp="^IPTV приставки$")
+def iptvconsole(message):
+
+# keyboard
+    markup = types.ReplyKeyboardMarkup(row_width=1)
+    item1 = types.KeyboardButton("Redbox Mini 3L_")
+    item2 = types.KeyboardButton("Redbox Mini 5PRO_")
+    item3 = types.KeyboardButton("Назад в тех. документацию")
+
+    markup.add(item1, item2, item3)
+    
+    bot.send_message(message.chat.id, "Выберите модель устройства:", reply_markup=markup)
+    pass
+
+@bot.message_handler(regexp="^Redbox Mini (3L_|5PRO_)$")
+def myfunction(message):
+    
+    if message.text == 'Redbox Mini 3L_':
+	    bot.send_message(message.chat.id, "Спецификация_3L_.pdf")
+    if message.text == 'Redbox Mini 5PRO_':
+	    bot.send_message(message.chat.id, "Спецификация_5PRO_.pdf")
+    pass
+
+@bot.message_handler(regexp="^Обновление и перепрошивка$")
+def myfunction(message):
+	bot.send_message(message.chat.id, "Как перепрошить.pdf")
+	pass
+
+@bot.message_handler(regexp="^Презентации и промо$")
+def myfunction(message):
+	bot.send_message(message.chat.id, "Файлы.rar")
+	pass
+
 @bot.message_handler(regexp="^Назад")
 def backfunction(message):
 
@@ -97,6 +130,8 @@ def backfunction(message):
         software(message)
     if message.text == 'Назад в Порталы и платформы':
         portalsandplatforms(message)
+    if message.text == 'Назад в тех. документацию':
+        techdoc(message)
     pass
 
 # RUN
