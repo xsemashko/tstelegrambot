@@ -4,10 +4,15 @@
 import telebot
 import config
 import os
+import dbworker
+from SQLighter import SQLighter
+import sqlite3
 
 from telebot import types
 
 bot = telebot.TeleBot(config.TOKEN)
+
+user_final_data = ""
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
@@ -133,6 +138,26 @@ def backfunction(message):
     if message.text == 'Назад в тех. документацию':
         techdoc(message)
     pass
+
+@bot.message_handler(commands=['customize'])
+def cmd_start(message):
+    global user_final_data
+    user_final_data = ""
+
+    keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    item1 = types.KeyboardButton("Redbox Mini 3L..")
+    item2 = types.KeyboardButton("Redbox Mini 5PRO..")
+    keyboard.add(item1, item2)
+
+    bot.send_message(message.chat.id, "Выберите модель:", reply_markup=keyboard)
+    dbworker.set_state(message.chat.id, config.States.S_SET_MAIN_APP.value)
+
+@bot.message_handler(commands=['reset'])
+def cmd_reset(message):
+    global user_final_data
+    user_final_data = ""
+    dbworker.set_state(message.chat.id, config.States.S_START.value)
+    welcome(message)
 
 # RUN
 bot.polling(none_stop=True)
