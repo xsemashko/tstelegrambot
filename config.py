@@ -19,3 +19,5 @@ class States(Enum):
     S_CHOOSE_DL_METH_GP = "7"
     S_WALLPAPER = "8"
     S_CHOOSE_DL_M_WALLPAPER = "9"
+
+    S_DISABLED = "X"

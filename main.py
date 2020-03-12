@@ -33,6 +33,7 @@ def welcome(message):
     
     bot.send_video(message.chat.id, FILEID, reply_markup=markup)
     #bot.send_message(message.chat.id, "Выберите интересующий Вас раздел:", reply_markup=markup)
+    dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
 
 @bot.message_handler(regexp="^Прошивки$")
 def software(message):
@@ -143,18 +144,70 @@ def backfunction(message):
 def cmd_start(message):
     global user_final_data
     user_final_data = ""
-
-    keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
     item1 = types.KeyboardButton("Redbox Mini 3L..")
     item2 = types.KeyboardButton("Redbox Mini 5PRO..")
     keyboard.add(item1, item2)
-
     bot.send_message(message.chat.id, "Выберите модель:", reply_markup=keyboard)
+    user_final_data = message.text
     dbworker.set_state(message.chat.id, config.States.S_SET_MAIN_APP.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_MAIN_APP.value)
+def cmd_set_mainapp(message):
+    global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("IPTVPORTAL..")
+    item2 = types.KeyboardButton("24 ТВ..")
+    item3 = types.KeyboardButton("СМОТРЕШКА..")
+    item4 = types.KeyboardButton("MOOVIE TV..")
+    item5 = types.KeyboardButton("MICROIM PULSE..")
+    item6 = types.KeyboardButton("PEERS TV..")
+    item7 = types.KeyboardButton("Используется плейлист..")
+    keyboard.add(item1, item2, item3, item4, item5, item6, item7)
+
+    bot.send_message(message.chat.id, "Выберите главное приложени:", reply_markup=keyboard)
+    user_final_data = user_final_data + message.text
+    #Тут надо предусмотреть разветвление
+    dbworker.set_state(message.chat.id, config.States.S_SET_LAUNCHE.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_LAUNCHE.value)
+def cmd_set_launcher(message):
+    global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("Лаучер..")
+    item2 = types.KeyboardButton("Автозапуск..")
+    item3 = types.KeyboardButton("Рабочий стол..")
+    keyboard.add(item1, item2, item3)
+    bot.send_message(message.chat.id, "Выберите тип запуска приложения:", reply_markup=keyboard)
+    user_final_data = user_final_data + message.text
+    dbworker.set_state(message.chat.id, config.States.S_SET_ONL_CINEMA.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_ONL_CINEMA.value)
+def cmd_set_online_cinema(message):
+    global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("MEGOGO..")
+    item2 = types.KeyboardButton("IVI..")
+    item3 = types.KeyboardButton("TVZAVR..")
+    item4 = types.KeyboardButton("START..")
+    item5 = types.KeyboardButton("MEDIATEKA..")
+    item6 = types.KeyboardButton("НЕ НУЖНО..")
+    keyboard.add(item1, item2, item3, item4, item5, item6)
+    bot.send_message(message.chat.id, "Выберите онлайн-кинотеатр:", reply_markup=keyboard)
+    user_final_data = user_final_data + message.text
+    dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_ADD_APP.value)
+def cmd_set_temp(message):
+    global user_final_data
+    user_final_data = user_final_data + message.text
+    bot.send_message(message.chat.id, user_final_data)
+    dbworker.set_state(message.chat.id, config.States.S_CUSTOMIZE_SETT.value)
 
 @bot.message_handler(commands=['reset'])
 def cmd_reset(message):
     global user_final_data
+    bot.send_message(message.chat.id, "Cancel")
     user_final_data = ""
     dbworker.set_state(message.chat.id, config.States.S_START.value)
     welcome(message)
