@@ -5,10 +5,10 @@ import telebot
 import config
 import os
 import dbworker
-from SQLighter import SQLighter
-import sqlite3
-
+import requests
 from telebot import types
+import urllib.request
+from os import path
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -149,7 +149,6 @@ def cmd_start(message):
     item2 = types.KeyboardButton("Redbox Mini 5PRO..")
     keyboard.add(item1, item2)
     bot.send_message(message.chat.id, "Выберите модель:", reply_markup=keyboard)
-    user_final_data = message.text
     dbworker.set_state(message.chat.id, config.States.S_SET_MAIN_APP.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_MAIN_APP.value)
@@ -195,14 +194,109 @@ def cmd_set_online_cinema(message):
     keyboard.add(item1, item2, item3, item4, item5, item6)
     bot.send_message(message.chat.id, "Выберите онлайн-кинотеатр:", reply_markup=keyboard)
     user_final_data = user_final_data + message.text
-    dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
+    dbworker.set_state(message.chat.id, config.States.S_SET_CINEMA_LAUNCH.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_CINEMA_LAUNCH.value)
+def cmd_set_cinema_launch(message):
+    global user_final_data
+    if message.text != "НЕ НУЖНО..":
+        keyboard = types.ReplyKeyboardMarkup(row_width=2)
+        item1 = types.KeyboardButton("Рабочий стол..")
+        item2 = types.KeyboardButton("Автозапуск..")
+        keyboard.add(item1, item2)
+        bot.send_message(message.chat.id, "Выберите тип запуска:", reply_markup=keyboard)
+        user_final_data = user_final_data + message.text
+        dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
+    else:
+        keyboard = types.ReplyKeyboardMarkup(row_width=2)
+        item1 = types.KeyboardButton("Далее")
+        keyboard.add(item1)
+        user_final_data = user_final_data + message.text
+        bot.send_message(message.chat.id, "Онлайн-кинотеатр не будет включен в прошивку, нажмите далее", reply_markup=keyboard)
+        dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_ADD_APP.value)
-def cmd_set_temp(message):
+def cmd_set_addon_app(message):
     global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("SMARTYOUTUBETV..")
+    item2 = types.KeyboardButton("WEATHER..")
+    item3 = types.KeyboardButton("OPERA..")
+    item4 = types.KeyboardButton("НЕ НУЖНО..")
+    keyboard.add(item1, item2, item3, item4)
+    bot.send_message(message.chat.id, "Выберите дополнительное приложение:", reply_markup=keyboard)
     user_final_data = user_final_data + message.text
-    bot.send_message(message.chat.id, user_final_data)
     dbworker.set_state(message.chat.id, config.States.S_CUSTOMIZE_SETT.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CUSTOMIZE_SETT.value)
+def cmd_set_addon_app(message):
+    global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("НЕ НУЖНЫ..")
+    item2 = types.KeyboardButton("НУЖНЫ..")
+    keyboard.add(item1, item2)
+    bot.send_message(message.chat.id, "Нужны ли изменения настроек?", reply_markup=keyboard)
+    user_final_data = user_final_data + message.text
+    dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
+
+    if message.text != "НЕ НУЖНО..":
+        dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
+    else:
+    	dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_WRITE_ABOUT_CHANGES.value)
+def cmd_write_about_changes(message):
+    global user_final_data
+    if message.text != "НЕ НУЖНО..":
+        bot.send_message(message.chat.id, "Напишите какие изменения необходимы.")
+        user_final_data = user_final_data + message.text
+        dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
+    else:
+        keyboard = types.ReplyKeyboardMarkup(row_width=2)
+        item1 = types.KeyboardButton("Далее")
+        keyboard.add(item1)
+        user_final_data = user_final_data + message.text
+        bot.send_message(message.chat.id, "Ок, нажмите Далее", reply_markup=keyboard)
+        dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value) 	
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_START_GRAPH.value)
+def cmd_choose_start_graphic(message):
+    global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("Логотип .png..")
+    item2 = types.KeyboardButton("Анимация .mp4..")
+    keyboard.add(item1, item2)
+    bot.send_message(message.chat.id, "Выберите графику при включении приставки:", reply_markup=keyboard)
+    user_final_data = user_final_data + message.text
+    dbworker.set_state(message.chat.id, config.States.S_CHOOSE_DL_METH_GP.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CHOOSE_DL_METH_GP.value)
+def cmd_choose_start_graphic(message):
+    global user_final_data
+    keyboard = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("Далее..")
+    keyboard.add(item1)
+    bot.send_message(message.chat.id, "Пришлите документом файл в выбранном формате")
+    user_final_data = user_final_data + message.text
+    dbworker.set_state(message.chat.id, config.States.S_WALLPAPER.value)
+
+@bot.message_handler(content_types=['document', 'audio'])
+def cmd_choose_wallpaper(message):
+    global user_final_data
+    if dbworker.get_current_state(message.chat.id) == config.States.S_WALLPAPER.value:
+        file_info = bot.get_file(message.document.file_id)
+        file_name = message.from_user.username + message.document.file_name
+        file_path = path.relpath("user_files/"+file_name)
+        keyboard = types.ReplyKeyboardMarkup(row_width=2)
+        item1 = types.KeyboardButton("Своя..")
+        item2 = types.KeyboardButton("Стандартная..")
+        keyboard.add(item1, item2)
+        bot.send_message(message.chat.id, "Выберете заставку рабочего стола:", reply_markup=keyboard)
+        #file_url = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path))
+        resource = urllib.request.urlopen('https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path))
+        output = open(file_path, "wb")
+        output.write(resource.read())
+        output.close()
 
 @bot.message_handler(commands=['reset'])
 def cmd_reset(message):
