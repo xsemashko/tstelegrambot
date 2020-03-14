@@ -273,10 +273,8 @@ def cmd_choose_start_graphic(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CHOOSE_DL_METH_GP.value)
 def cmd_choose_start_graphic(message):
     global user_final_data
-    keyboard = types.ReplyKeyboardMarkup(row_width=2)
-    item1 = types.KeyboardButton("Далее..")
-    keyboard.add(item1)
-    bot.send_message(message.chat.id, "Пришлите документом файл в выбранном формате")
+    keyboard = types.ReplyKeyboardRemove()
+    bot.send_message(message.chat.id, "Пришлите документом файл в выбранном формате", reply_markup=keyboard)
     user_final_data = user_final_data + message.text
     dbworker.set_state(message.chat.id, config.States.S_WALLPAPER.value)
 
