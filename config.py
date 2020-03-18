@@ -21,5 +21,6 @@ class States(Enum):
     S_CHOOSE_DL_METH_GP = "9"
     S_WALLPAPER = "10"
     S_CHOOSE_DL_M_WALLPAPER = "11"
-
+    S_DOWNLOAD_WALLPAPER = "12"
+    S_FINAL = "13"
     S_DISABLED = "X"
