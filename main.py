@@ -9,10 +9,17 @@ import requests
 from telebot import types
 import urllib.request
 from os import path
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 bot = telebot.TeleBot(config.TOKEN)
 
 user_final_data = ""
+
+sender_email = "telegrambottechsane"
+receiver_email = "ollien_sk8@mail.ru"
+password = config.E_PASSWD
 
 @bot.message_handler(commands=['start'])
 @bot.message_handler(regexp="^Вернуться в главное меню.$")
@@ -288,7 +295,8 @@ def cmd_write_about_changes(message):
         cmd_reset(message)
     else:
         if message.text != "НЕ НУЖНО.":
-            bot.send_message(message.chat.id, "Напишите какие изменения необходимы.")
+        	keyboard = types.ReplyKeyboardRemove()
+            bot.send_message(message.chat.id, "Напишите какие изменения необходимы.", reply_markup=keyboard)
             #user_final_data = user_final_data + message.text
             dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
         else:
@@ -382,6 +390,9 @@ def cmd_choose_start_graphic(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_FINAL.value)
 def cmd_choose_start_graphic(message):
     global user_final_data
+    global sender_email
+    global receiver_email
+    global password
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -392,9 +403,21 @@ def cmd_choose_start_graphic(message):
         user_final_data = user_final_data + "Имя пользователя: " + user_name + "\n" + "Контактные данные: " + message.text + "\n"
         bot.send_message(message.chat.id, "Вы завершили кастомизацию, в ближайшее время с Вами свяжутся",  reply_markup=keyboard)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
-        output = open("file01.txt", "w")
-        output.write(user_final_data)
-        output.close()
+        #output = open("file01.txt", "w")
+        #output.write(user_final_data)
+        #output.close()
+        #send email
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "Поступила кастомизация от: " + user_name
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        text = user_final_data
+        part1 = MIMEText(text, "plain")
+        message.attach(part1)
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
 
 @bot.message_handler(commands=['reset'])
 @bot.message_handler(regexp="^Отменить кастомизацию.$")

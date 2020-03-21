@@ -5,11 +5,11 @@ from enum import Enum
 TOKEN = '1126792603:AAF0XMgLYgbQ8Zznp275qQPJiTODCEezHzc'
 db_file = "database.vdb"
 database_name = 'database.db'
-shelve_name = 'shelve.db'
+E_PASSWD = 'Rtybvc-764'
 
 class States(Enum):
 
-    S_START = "0"  # Начало нового диалога
+    S_START = "0"
     S_SET_MAIN_APP = "1"
     S_SET_LAUNCHE = "2"
     S_SET_ONL_CINEMA = "3"
