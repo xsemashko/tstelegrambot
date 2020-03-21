@@ -12,6 +12,7 @@ from os import path
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from SQLighter import SQLighter
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -295,7 +296,7 @@ def cmd_write_about_changes(message):
         cmd_reset(message)
     else:
         if message.text != "НЕ НУЖНО.":
-        	keyboard = types.ReplyKeyboardRemove()
+            keyboard = types.ReplyKeyboardRemove()
             bot.send_message(message.chat.id, "Напишите какие изменения необходимы.", reply_markup=keyboard)
             #user_final_data = user_final_data + message.text
             dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
@@ -399,7 +400,12 @@ def cmd_choose_start_graphic(message):
         keyboard = types.ReplyKeyboardMarkup(row_width=2)
         item1 = types.KeyboardButton("Вернуться в главное меню.")
         keyboard.add(item1)
-        user_name = message.from_user.username
+
+        if message.from_user.username is None:
+        	user_name = "Имя пользователя неопределено"
+        else:
+            user_name = message.from_user.username
+
         user_final_data = user_final_data + "Имя пользователя: " + user_name + "\n" + "Контактные данные: " + message.text + "\n"
         bot.send_message(message.chat.id, "Вы завершили кастомизацию, в ближайшее время с Вами свяжутся",  reply_markup=keyboard)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
@@ -427,6 +433,14 @@ def cmd_reset(message):
     user_final_data = ""
     dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
     welcome(message)
+
+@bot.message_handler(commands=['getuserdata'])
+def cmd_get_usr_data(message):
+	if message.from_user.id:
+	    bot.send_message(message.chat.id, message.from_user.id)
+	else:
+		bot.send_message(message.chat.id, "No DATA about user")
+
 #Конец блока кастомизации
 # RUN
 bot.polling(none_stop=True)
