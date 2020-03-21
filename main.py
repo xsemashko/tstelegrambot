@@ -508,6 +508,8 @@ def cmd_choose_start_graphic(message):
         sql = "UPDATE user_custom SET Username='{0}', Contact_data='{1}' where user_id={2}".format(user_name, message.text.rstrip("."), message.from_user.id)
         cursor.execute(sql)
         conn.commit()
+        sql2 = "SELECT * FROM user_custom WHERE user_id={0}".format(message.from_user.id)
+        a = cursor.execute(sql2).fetchone()
         conn.close()
         user_final_data = user_final_data + "Имя пользователя: " + user_name + "\n" + "Контактные данные: " + message.text + "\n"
         bot.send_message(message.chat.id, "Вы завершили кастомизацию, в ближайшее время с Вами свяжутся",  reply_markup=keyboard)
@@ -520,13 +522,13 @@ def cmd_choose_start_graphic(message):
         message["Subject"] = "Поступила кастомизация от: " + user_name
         message["From"] = sender_email
         message["To"] = receiver_email
-        text = user_final_data
+        text = "Модель: " + a[1] + "\n" + "Главное приложение: " + a[2] + "\n" "Тип запуска главного приложения: " + a[3] + "\n" + "Онлайн-кинотеатр: " + a[4] + "\n" + "Тип запуска онлайн-кинотеатра: " + a[5] + "\n" + "Дополнительные приложения: " + a[6] + "\n" + "Необходимые изменения: " + a[7] + "\n" "Графика при запуске: " + a[8] + "\n" + "Основная заставка: " + a[9] + "\n" "Контактные данные: " + a[11] + "\n" + "Имя пользователя в Telegram: " + a[10]
         part1 = MIMEText(text, "plain")
         message.attach(part1)
-#        context = ssl.create_default_context()
-#        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-#            server.login(sender_email, password)
-#            server.sendmail(sender_email, receiver_email, message.as_string())
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
 
 @bot.message_handler(commands=['reset'])
 @bot.message_handler(regexp="^Отменить кастомизацию.$")
