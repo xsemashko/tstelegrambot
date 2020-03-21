@@ -170,7 +170,7 @@ def cmd_set_mainapp(message):
         item8 = types.KeyboardButton("Отменить кастомизацию.")
         keyboard.add(item1, item2, item3, item4, item5, item6, item7, item8)
 
-        bot.send_message(message.chat.id, "Выберите главное приложени:", reply_markup=keyboard)
+        bot.send_message(message.chat.id, "Выберите основное приложени:", reply_markup=keyboard)
         user_final_data = user_final_data + "Модель: " + message.text.rstrip(".") + "\n"
         #Тут надо предусмотреть разветвление
         dbworker.set_state(message.chat.id, config.States.S_SET_LAUNCHE.value)
@@ -188,7 +188,7 @@ def cmd_set_launcher(message):
             item3 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2, item3)
             bot.send_message(message.chat.id, "Выберите тип запуска приложения:", reply_markup=keyboard)
-            user_final_data = user_final_data + message.text
+            user_final_data = user_final_data + "Основное приложение: " + message.text + "\n"
             dbworker.set_state(message.chat.id, config.States.S_SET_ONL_CINEMA.value)
         else:
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
@@ -198,7 +198,7 @@ def cmd_set_launcher(message):
             item4 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2, item3, item4)
             bot.send_message(message.chat.id, "Выберите тип запуска приложения:", reply_markup=keyboard)
-            user_final_data = user_final_data + message.text
+            user_final_data = user_final_data + "Основное приложение: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_SET_ONL_CINEMA.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_ONL_CINEMA.value)
@@ -217,7 +217,7 @@ def cmd_set_online_cinema(message):
         item7 = types.KeyboardButton("Отменить кастомизацию.")
         keyboard.add(item1, item2, item3, item4, item5, item6, item7)
         bot.send_message(message.chat.id, "Выберите онлайн-кинотеатр:", reply_markup=keyboard)
-        user_final_data = user_final_data + message.text
+        user_final_data = user_final_data + "Тип запуска основного приложения: "  + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_SET_CINEMA_LAUNCH.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_CINEMA_LAUNCH.value)
@@ -233,14 +233,14 @@ def cmd_set_cinema_launch(message):
             item3 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2, item3)
             bot.send_message(message.chat.id, "Выберите тип запуска:", reply_markup=keyboard)
-            user_final_data = user_final_data + message.text
+            user_final_data = user_final_data + "Онлайн-кинотеатр: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
         else:
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
             item1 = types.KeyboardButton("Далее")
             item2 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2)
-            user_final_data = user_final_data + message.text
+            user_final_data = user_final_data + "Онлайн-кинотеатр: " + message.text.rstrip(".") + "\n"
             bot.send_message(message.chat.id, "Онлайн-кинотеатр не будет включен в прошивку, нажмите далее", reply_markup=keyboard)
             dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
 
@@ -258,7 +258,8 @@ def cmd_set_addon_app(message):
         item5 = types.KeyboardButton("Отменить кастомизацию.")
         keyboard.add(item1, item2, item3, item4, item5)
         bot.send_message(message.chat.id, "Выберите дополнительное приложение:", reply_markup=keyboard)
-        user_final_data = user_final_data + message.text
+        if message.text != "Далее":
+            user_final_data = user_final_data + "Метод запуска онлайн-кинотеатра: " + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_CUSTOMIZE_SETT.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CUSTOMIZE_SETT.value)
@@ -273,7 +274,7 @@ def cmd_set_addon_app(message):
         item3 = types.KeyboardButton("Отменить кастомизацию.")
         keyboard.add(item1, item2, item3)
         bot.send_message(message.chat.id, "Нужны ли изменения настроек?", reply_markup=keyboard)
-        user_final_data = user_final_data + message.text
+        user_final_data = user_final_data + "Дополнительные приложения: " + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
         if message.text != "НЕ НУЖНО.":
             dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
@@ -288,14 +289,14 @@ def cmd_write_about_changes(message):
     else:
         if message.text != "НЕ НУЖНО.":
             bot.send_message(message.chat.id, "Напишите какие изменения необходимы.")
-            user_final_data = user_final_data + message.text
+            #user_final_data = user_final_data + message.text
             dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
         else:
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
             item1 = types.KeyboardButton("Далее")
             item2 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2)
-            user_final_data = user_final_data + message.text
+            #user_final_data = user_final_data + message.text
             bot.send_message(message.chat.id, "Нажмите Далее, чтобы продолжить или Отменить", reply_markup=keyboard)
             dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value) 	
 
@@ -311,7 +312,8 @@ def cmd_choose_start_graphic(message):
         item3 = types.KeyboardButton("Отменить кастомизацию.")
         keyboard.add(item1, item2, item3)
         bot.send_message(message.chat.id, "Выберите графику при включении приставки:", reply_markup=keyboard)
-        user_final_data = user_final_data + message.text
+        if message.text != "Далее":
+            user_final_data = user_final_data + "Необходимы следующие изменения: \n" + message.text + "\n"
         dbworker.set_state(message.chat.id, config.States.S_CHOOSE_DL_METH_GP.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CHOOSE_DL_METH_GP.value)
@@ -321,7 +323,7 @@ def cmd_choose_start_graphic(message):
     item1 = types.KeyboardButton("Отменить кастомизацию.")
     keyboard.add(item1)
     bot.send_message(message.chat.id, "Пришлите документом файл в выбранном формате или нажмите Отмену", reply_markup=keyboard)
-    user_final_data = user_final_data + message.text
+    user_final_data = user_final_data + "Графика при запуске приставки:" + message.text.rstrip(".") + "\n"
     dbworker.set_state(message.chat.id, config.States.S_WALLPAPER.value)
 
 @bot.message_handler(content_types=['document'])
@@ -338,7 +340,7 @@ def cmd_choose_wallpaper(message):
         keyboard.add(item1, item2, item3)
         bot.send_message(message.chat.id, "Выберете заставку рабочего стола:", reply_markup=keyboard)
         url = 'https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path)
-        user_final_data = user_final_data + url
+        user_final_data = user_final_data + url + "\n"
         dbworker.set_state(message.chat.id, config.States.S_CHOOSE_DL_M_WALLPAPER.value)
         #file_url = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path))
         #resource = urllib.request.urlopen('https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path))
@@ -352,7 +354,7 @@ def cmd_choose_wallpaper(message):
         item1 = types.KeyboardButton("Отменить кастомизацию.")
         keyboard.add(item1)
         bot.send_message(message.chat.id, "Оставьте контактные данные и нажмите Далее", reply_markup=keyboard)
-        user_final_data = user_final_data + url
+        user_final_data = user_final_data + url + "\n"
         dbworker.set_state(message.chat.id, config.States.S_FINAL.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CHOOSE_DL_M_WALLPAPER.value)
@@ -366,7 +368,7 @@ def cmd_choose_start_graphic(message):
             item1 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1)
             bot.send_message(message.chat.id, "Загрузите заставку 1920x1080 .png", reply_markup=keyboard)
-            user_final_data = user_final_data + message.text
+            user_final_data = user_final_data + "Заставка для рабочего стола: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_DOWNLOAD_WALLPAPER.value)
         if message.text != "Своя.":
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
@@ -374,6 +376,7 @@ def cmd_choose_start_graphic(message):
             item2 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2)
             bot.send_message(message.chat.id, "Оставьте контактные данные или нажмите Отменить", reply_markup=keyboard)
+            user_final_data = user_final_data + "Заставка для рабочего стола: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_FINAL.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_FINAL.value)
@@ -386,7 +389,7 @@ def cmd_choose_start_graphic(message):
         item1 = types.KeyboardButton("Вернуться в главное меню.")
         keyboard.add(item1)
         user_name = message.from_user.username
-        user_final_data = user_final_data + user_name + message.text
+        user_final_data = user_final_data + "Имя пользователя: " + user_name + "\n" + "Контактные данные: " + message.text + "\n"
         bot.send_message(message.chat.id, "Вы завершили кастомизацию, в ближайшее время с Вами свяжутся",  reply_markup=keyboard)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
         output = open("file01.txt", "w")
