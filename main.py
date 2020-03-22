@@ -3,20 +3,16 @@
 
 import telebot
 import config
-import os
 import dbworker
 import requests
 from telebot import types
 import urllib.request
-from os import path
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sqlite3
 
 bot = telebot.TeleBot(config.TOKEN)
-
-user_final_data = ""
 
 sender_email = "telegrambottechsane"
 receiver_email = "ollien_sk8@mail.ru"
@@ -41,7 +37,6 @@ def welcome(message):
     markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
     
     bot.send_video(message.chat.id, FILEID, reply_markup=markup)
-    #bot.send_message(message.chat.id, "Выберите интересующий Вас раздел:", reply_markup=markup)
     dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
 
 @bot.message_handler(regexp="^Прошивки$")
@@ -151,7 +146,6 @@ def backfunction(message):
 #Начало блока кастомизации
 @bot.message_handler(commands=['customize'])
 def cmd_start(message):
-    global user_final_data
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     user_final_data = ""
@@ -176,7 +170,6 @@ def cmd_start(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_MAIN_APP.value)
 def cmd_set_mainapp(message):
-    global user_final_data
     datasql = (message.text, message.from_user.id)
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
@@ -198,12 +191,10 @@ def cmd_set_mainapp(message):
         cursor.execute(sql)
         conn.commit()
         conn.close()
-        user_final_data = user_final_data + "Модель: " + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_SET_LAUNCHE.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_LAUNCHE.value)
 def cmd_set_launcher(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -220,7 +211,6 @@ def cmd_set_launcher(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Основное приложение: " + message.text + "\n"
             dbworker.set_state(message.chat.id, config.States.S_SET_ONL_CINEMA.value)
         else:
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
@@ -236,12 +226,10 @@ def cmd_set_launcher(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Основное приложение: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_SET_ONL_CINEMA.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_ONL_CINEMA.value)
 def cmd_set_online_cinema(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -261,12 +249,10 @@ def cmd_set_online_cinema(message):
         cursor.execute(sql)
         conn.commit()
         conn.close()
-        user_final_data = user_final_data + "Тип запуска основного приложения: "  + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_SET_CINEMA_LAUNCH.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_CINEMA_LAUNCH.value)
 def cmd_set_cinema_launch(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -283,7 +269,6 @@ def cmd_set_cinema_launch(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Онлайн-кинотеатр: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
         else:
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
@@ -296,13 +281,11 @@ def cmd_set_cinema_launch(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Онлайн-кинотеатр: " + message.text.rstrip(".") + "\n"
             bot.send_message(message.chat.id, "Онлайн-кинотеатр не будет включен в прошивку, нажмите далее", reply_markup=keyboard)
             dbworker.set_state(message.chat.id, config.States.S_SET_ADD_APP.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SET_ADD_APP.value)
 def cmd_set_addon_app(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -321,12 +304,10 @@ def cmd_set_addon_app(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Метод запуска онлайн-кинотеатра: " + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_CUSTOMIZE_SETT.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CUSTOMIZE_SETT.value)
 def cmd_set_addon_app(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -342,36 +323,27 @@ def cmd_set_addon_app(message):
         cursor.execute(sql)
         conn.commit()
         conn.close()
-        user_final_data = user_final_data + "Дополнительные приложения: " + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
-#        if message.text != "НЕ НУЖНО.":
-#            dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
-#        else:
-#            dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_WRITE_ABOUT_CHANGES.value)
 def cmd_write_about_changes(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
         if message.text == "НУЖНЫ.":
             keyboard = types.ReplyKeyboardRemove()
             bot.send_message(message.chat.id, "Напишите какие изменения необходимы.", reply_markup=keyboard)
-            #user_final_data = user_final_data + message.text
             dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
         else:
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
             item1 = types.KeyboardButton("Далее")
             item2 = types.KeyboardButton("Отменить кастомизацию.")
             keyboard.add(item1, item2)
-            #user_final_data = user_final_data + message.text
             bot.send_message(message.chat.id, "Нажмите Далее, чтобы продолжить или Отменить", reply_markup=keyboard)
             dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value) 	
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_START_GRAPH.value)
 def cmd_choose_start_graphic(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -388,12 +360,10 @@ def cmd_choose_start_graphic(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Необходимы следующие изменения: \n" + message.text + "\n"
         dbworker.set_state(message.chat.id, config.States.S_CHOOSE_DL_METH_GP.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CHOOSE_DL_METH_GP.value)
 def cmd_choose_start_graphic(message):
-    global user_final_data
     keyboard = types.ReplyKeyboardMarkup(row_width=2)
     item1 = types.KeyboardButton("Отменить кастомизацию.")
     keyboard.add(item1)
@@ -404,16 +374,12 @@ def cmd_choose_start_graphic(message):
     cursor.execute(sql)
     conn.commit()
     conn.close()
-    user_final_data = user_final_data + "Графика при запуске приставки:" + message.text.rstrip(".") + "\n"
     dbworker.set_state(message.chat.id, config.States.S_WALLPAPER.value)
 
 @bot.message_handler(content_types=['document'])
 def cmd_choose_wallpaper(message):
-    global user_final_data
     if dbworker.get_current_state(message.chat.id) == config.States.S_WALLPAPER.value:
         file_info = bot.get_file(message.document.file_id)
-        #file_name = message.from_user.username + message.document.file_name
-        #file_path = path.relpath("user_files/"+file_name)
         keyboard = types.ReplyKeyboardMarkup(row_width=2)
         item1 = types.KeyboardButton("Своя.")
         item2 = types.KeyboardButton("Стандартная.")
@@ -427,13 +393,8 @@ def cmd_choose_wallpaper(message):
         cursor.execute(sql)
         conn.commit()
         conn.close()
-        user_final_data = user_final_data + url + "\n"
         dbworker.set_state(message.chat.id, config.States.S_CHOOSE_DL_M_WALLPAPER.value)
-        #file_url = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path))
-        #resource = urllib.request.urlopen('https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path))
-        #output = open(file_path, "wb")
-        #output.write(resource.read())
-        #output.close()
+
     if dbworker.get_current_state(message.chat.id) == config.States.S_DOWNLOAD_WALLPAPER.value:
         file_info = bot.get_file(message.document.file_id)
         url = 'https://api.telegram.org/file/bot{0}/{1}'.format(config.TOKEN, file_info.file_path)
@@ -447,12 +408,10 @@ def cmd_choose_wallpaper(message):
         cursor.execute(sql)
         conn.commit()
         conn.close()
-        user_final_data = user_final_data + url + "\n"
         dbworker.set_state(message.chat.id, config.States.S_FINAL.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CHOOSE_DL_M_WALLPAPER.value)
 def cmd_choose_start_graphic(message):
-    global user_final_data
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
@@ -467,13 +426,11 @@ def cmd_choose_start_graphic(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Заставка для рабочего стола: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_DOWNLOAD_WALLPAPER.value)
         if message.text != "Своя.":
             keyboard = types.ReplyKeyboardMarkup(row_width=2)
-            item1 = types.KeyboardButton("Далее.")
-            item2 = types.KeyboardButton("Отменить кастомизацию.")
-            keyboard.add(item1, item2)
+            item1 = types.KeyboardButton("Отменить кастомизацию.")
+            keyboard.add(item1)
             bot.send_message(message.chat.id, "Оставьте контактные данные или нажмите Отменить", reply_markup=keyboard)
             conn = sqlite3.connect("database.db")
             cursor = conn.cursor()
@@ -481,12 +438,10 @@ def cmd_choose_start_graphic(message):
             cursor.execute(sql)
             conn.commit()
             conn.close()
-            user_final_data = user_final_data + "Заставка для рабочего стола: " + message.text.rstrip(".") + "\n"
             dbworker.set_state(message.chat.id, config.States.S_FINAL.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_FINAL.value)
 def cmd_choose_start_graphic(message):
-    global user_final_data
     global sender_email
     global receiver_email
     global password
@@ -509,13 +464,8 @@ def cmd_choose_start_graphic(message):
         sql2 = "SELECT * FROM user_custom WHERE user_id={0}".format(message.from_user.id)
         a = cursor.execute(sql2).fetchone()
         conn.close()
-        user_final_data = user_final_data + "Имя пользователя: " + user_name + "\n" + "Контактные данные: " + message.text + "\n"
         bot.send_message(message.chat.id, "Вы завершили кастомизацию, в ближайшее время с Вами свяжутся",  reply_markup=keyboard)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
-        #output = open("file01.txt", "w")
-        #output.write(user_final_data)
-        #output.close()
-        #send email
         message = MIMEMultipart("alternative")
         message["Subject"] = "Поступила кастомизация от: " + user_name
         message["From"] = sender_email
@@ -531,9 +481,7 @@ def cmd_choose_start_graphic(message):
 @bot.message_handler(commands=['reset'])
 @bot.message_handler(regexp="^Отменить кастомизацию.$")
 def cmd_reset(message):
-    global user_final_data
     bot.send_message(message.chat.id, "Cancel")
-    user_final_data = ""
     dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
     welcome(message)
 
@@ -543,7 +491,6 @@ def cmd_get_usr_data(message):
 	    bot.send_message(message.chat.id, message.from_user.id)
 	else:
 		bot.send_message(message.chat.id, "No DATA about user")
-
 #Конец блока кастомизации
 # RUN
 bot.polling(none_stop=True)
