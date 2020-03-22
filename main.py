@@ -162,7 +162,8 @@ def cmd_start(message):
     sql = "select User_id from user_custom where user_id=?"
     a = cursor.execute(sql, [(user_id)]).fetchall()
     if a:
-    	pass
+        sql = "UPDATE user_custom SET Model=Null, Main_application=Null, MA_launch_type=Null, Online_cinema=Null, OC_launch_type=Null, Additional_app=Null, Required_changes=Null, Box_start_graphic=Null, Wallpaper=Null, Username=Null, Contact_data=Null, Box_start_gr_type=Null WHERE User_id=?"
+        cursor.execute(sql, [(user_id)])
     else:
         sql = "INSERT INTO user_custom (User_id) VALUES (?)"
         cursor.execute(sql, [(user_id)])
