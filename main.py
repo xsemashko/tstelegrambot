@@ -14,9 +14,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sqlite3
 
-#conn = sqlite3.connect("database.db")
-#cursor = conn.cursor()
-
 bot = telebot.TeleBot(config.TOKEN)
 
 user_final_data = ""
@@ -162,7 +159,7 @@ def cmd_start(message):
     sql = "select User_id from user_custom where user_id=?"
     a = cursor.execute(sql, [(user_id)]).fetchall()
     if a:
-        sql = "UPDATE user_custom SET Model=Null, Main_application=Null, MA_launch_type=Null, Online_cinema=Null, OC_launch_type=Null, Additional_app=Null, Required_changes=Null, Box_start_graphic=Null, Wallpaper=Null, Username=Null, Contact_data=Null, Box_start_gr_type=Null WHERE User_id=?"
+        sql = "UPDATE user_custom SET Model='Null', Main_application='Null', MA_launch_type='Null', Online_cinema='Null', OC_launch_type='Null', Additional_app='Null', Required_changes='Null', Box_start_graphic='Null', Wallpaper='Null', Username='Null', Contact_data='Null', Box_start_gr_type='Null' WHERE User_id=?"
         cursor.execute(sql, [(user_id)])
     else:
         sql = "INSERT INTO user_custom (User_id) VALUES (?)"
@@ -347,10 +344,10 @@ def cmd_set_addon_app(message):
         conn.close()
         user_final_data = user_final_data + "Дополнительные приложения: " + message.text.rstrip(".") + "\n"
         dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
-        if message.text != "НЕ НУЖНО.":
-            dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
-        else:
-            dbworker.set_state(message.chat.id, config.States.S_START_GRAPH.value)
+#        if message.text != "НЕ НУЖНО.":
+#            dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
+#        else:
+#            dbworker.set_state(message.chat.id, config.States.S_WRITE_ABOUT_CHANGES.value)
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_WRITE_ABOUT_CHANGES.value)
 def cmd_write_about_changes(message):
@@ -358,7 +355,7 @@ def cmd_write_about_changes(message):
     if message.text == "Отменить кастомизацию.":
         cmd_reset(message)
     else:
-        if message.text != "НЕ НУЖНО.":
+        if message.text == "НУЖНЫ.":
             keyboard = types.ReplyKeyboardRemove()
             bot.send_message(message.chat.id, "Напишите какие изменения необходимы.", reply_markup=keyboard)
             #user_final_data = user_final_data + message.text
