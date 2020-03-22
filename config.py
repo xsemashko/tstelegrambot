@@ -24,3 +24,4 @@ class States(Enum):
     S_DOWNLOAD_WALLPAPER = "12"
     S_FINAL = "13"
     S_DISABLED = "X"
+    P_REDBOX3L_APP = "20"
