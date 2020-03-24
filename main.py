@@ -29,7 +29,7 @@ def welcome(message):
     item2 = types.KeyboardButton("Техническая документация")
     item3 = types.KeyboardButton("Программы и утилиты")
     item4 = types.KeyboardButton("Приложения и кинотеатры")
-    item5 = types.KeyboardButton("Удаленное управлене")
+    item5 = types.KeyboardButton("Удаленное управление")
     item6 = types.KeyboardButton("Техническая поддержка")
     item7 = types.KeyboardButton("Приобрести оборудование")
     item8 = types.KeyboardButton("Тестирование")
@@ -156,6 +156,17 @@ def cmd_choose_appforl(message):
         bot.send_message(message.chat.id, "2PEERS TV Автозупуск Файл рар")
         bot.send_message(message.chat.id, "2PEERS TV Лаунчер Файл рар")
 
+@bot.message_handler(regexp="^Кастомизация$")
+def customizemenu(message):
+    markup = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("Варианты кастомизации")
+    item2 = types.KeyboardButton("Собрать свой кастом")
+    item3 = types.KeyboardButton("Назад в Порталы и платформы")
+    markup.add(item1, item2, item3)
+    bot.send_message(message.chat.id, "Выберите приложение:", reply_markup=markup)
+    #dbworker.set_state(message.chat.id, config.States.P_REDBOX5PRO_APP.value)
+    pass
+
 #Блок Техническая документация
 @bot.message_handler(regexp="^Техническая документация$")
 def techdoc(message):
@@ -218,6 +229,7 @@ def backfunction(message):
     pass
 #Начало блока кастомизации
 @bot.message_handler(commands=['customize'])
+@bot.message_handler(regexp="^Собрать свой кастом$")
 def cmd_start(message):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
