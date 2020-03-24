@@ -93,6 +93,21 @@ def redboxminil(message):
     dbworker.set_state(message.chat.id, config.States.P_REDBOX3L_APP.value)
     pass
 
+@bot.message_handler(regexp="^Redbox Mini 5PRO$")
+def redboxminil(message):
+    markup = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("IPTVPORTAL")
+    item2 = types.KeyboardButton("24 ТВ")
+    item3 = types.KeyboardButton("СМОТРЕШКА")
+    item4 = types.KeyboardButton("MOOVI TV")
+    item5 = types.KeyboardButton("MICROIMPULS")
+    item6 = types.KeyboardButton("PEERS TV")
+    item7 = types.KeyboardButton("Назад в Порталы и платформы")
+    markup.add(item1, item2, item3, item4, item5, item6, item7)
+    bot.send_message(message.chat.id, "Выберите приложение:", reply_markup=markup)
+    dbworker.set_state(message.chat.id, config.States.P_REDBOX5PRO_APP.value)
+    pass
+
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.P_REDBOX3L_APP.value)
 def cmd_choose_appforl(message):
     if message.text == "Назад в Порталы и платформы":
@@ -117,34 +132,50 @@ def cmd_choose_appforl(message):
         bot.send_message(message.chat.id, "PEERS TV Автозупуск Файл рар")
         bot.send_message(message.chat.id, "PEERS TV Лаунчер Файл рар")
 
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.P_REDBOX5PRO_APP.value)
+def cmd_choose_appforl(message):
+    if message.text == "Назад в Порталы и платформы":
+        portalsandplatforms(message)
+        dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
+    elif message.text == "IPTVPORTAL":
+        bot.send_message(message.chat.id, "2IPTVPORTAL Автозупуск Файл рар")
+        bot.send_message(message.chat.id, "2IPTVPORTAL Лаунчер Файл рар")
+    elif message.text == "24 ТВ":
+        bot.send_message(message.chat.id, "224 ТВ Автозупуск Файл рар")
+        bot.send_message(message.chat.id, "224 ТВ Лаунчер Файл рар")
+    elif message.text == "СМОТРЕШКА":
+        bot.send_message(message.chat.id, "2СМОТРЕШКА Автозупуск Файл рар")
+        bot.send_message(message.chat.id, "2СМОТРЕШКА Лаунчер Файл рар")
+    elif message.text == "MOOVI TV":
+        bot.send_message(message.chat.id, "2MOOVI TV Автозупуск Файл рар")
+        bot.send_message(message.chat.id, "2MOOVI TV Лаунчер Файл рар")
+    elif message.text == "MICROIMPULS":
+        bot.send_message(message.chat.id, "2MICROIMPULS Автозупуск Файл рар")
+        bot.send_message(message.chat.id, "2MICROIMPULS Лаунчер Файл рар")
+    elif message.text == "PEERS TV":
+        bot.send_message(message.chat.id, "2PEERS TV Автозупуск Файл рар")
+        bot.send_message(message.chat.id, "2PEERS TV Лаунчер Файл рар")
+
 #Блок Техническая документация
 @bot.message_handler(regexp="^Техническая документация$")
 def techdoc(message):
-
-# keyboard
     markup = types.ReplyKeyboardMarkup(row_width=1)
     item1 = types.KeyboardButton("IPTV приставки")
     item2 = types.KeyboardButton("Обновление и перепрошивка")
     item3 = types.KeyboardButton("Презентации и промо")
     item4 = types.KeyboardButton("Удалённое управление")
     item5 = types.KeyboardButton("Назад в гл.меню")
-
     markup.add(item1, item2, item3, item4, item5)
-
     bot.send_message(message.chat.id, "Выберите интересующую категорию", reply_markup=markup)
     pass
 
 @bot.message_handler(regexp="^IPTV приставки$")
 def iptvconsole(message):
-
-# keyboard
     markup = types.ReplyKeyboardMarkup(row_width=1)
     item1 = types.KeyboardButton("Redbox Mini 3L_")
     item2 = types.KeyboardButton("Redbox Mini 5PRO_")
     item3 = types.KeyboardButton("Назад в тех. документацию")
-
     markup.add(item1, item2, item3)
-    
     bot.send_message(message.chat.id, "Выберите модель устройства:", reply_markup=markup)
     pass
 
