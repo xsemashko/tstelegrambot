@@ -167,6 +167,25 @@ def customizemenu(message):
     #dbworker.set_state(message.chat.id, config.States.P_REDBOX5PRO_APP.value)
     pass
 
+@bot.message_handler(regexp="^Стоковая прошивка$")
+def stockfirmware(message):
+    markup = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("RedBox Mini 3L...")
+    item2 = types.KeyboardButton("RedBox Mini 5PRO...")
+    item3 = types.KeyboardButton("Назад в Порталы и платформы")
+    #тут надо будет заменить на инлайн
+    markup.add(item1, item2, item3)
+    bot.send_message(message.chat.id, "Выберите устройство:", reply_markup=markup)
+
+@bot.message_handler(regexp="^Прошивки для операторов$")
+def operfirmware(message):
+    markup = types.ReplyKeyboardMarkup(row_width=2)
+    item1 = types.KeyboardButton("RedBox Mini 3L:")
+    item2 = types.KeyboardButton("RedBox Mini 5PRO:")
+    item3 = types.KeyboardButton("Назад в Порталы и платформы")
+    markup.add(item1, item2, item3)
+    bot.send_message(message.chat.id, "Выберите устройство:", reply_markup=markup)
+
 #Блок Техническая документация
 @bot.message_handler(regexp="^Техническая документация$")
 def techdoc(message):
@@ -227,6 +246,42 @@ def backfunction(message):
     if message.text == 'Назад в тех. документацию':
         techdoc(message)
     pass
+
+@bot.message_handler(regexp="^Техническая поддержка")
+def msgtosupport(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Вернуться в главное меню.")
+    markup.add(item1)
+    bot.send_message(message.chat.id, "Напишите одним сообщением текст обращения и Ваши контактные данные:", reply_markup=markup)
+    dbworker.set_state(message.chat.id, config.States.T_SUPPORT_MSG.value)
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.T_SUPPORT_MSG.value)
+def mssgtosupport(message):
+    user_msg_to_sup = ""
+    global sender_email
+    global receiver_email
+    global password
+    if message.from_user.username is None:
+        user_name = "Имя пользователя неопределено"
+    else:
+        user_name = message.from_user.username
+    user_msg_to_sup = user_msg_to_sup + user_name + "\n" + message.text
+    messagetomail = MIMEMultipart("alternative")
+    messagetomail["Subject"] = "Поступило обращение от: " + user_name
+    messagetomail["From"] = sender_email
+    messagetomail["To"] = receiver_email
+    text = user_msg_to_sup
+    part1 = MIMEText(text, "plain")
+    messagetomail.attach(part1)
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, messagetomail.as_string())
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Вернуться в главное меню.")
+    markup.add(item1)
+    bot.send_message(message.chat.id, "Ваше обращение успешно принято, нажмите Вернуться в главное меню.:", reply_markup=markup)
+
 #Начало блока кастомизации
 @bot.message_handler(commands=['customize'])
 @bot.message_handler(regexp="^Собрать свой кастом$")
