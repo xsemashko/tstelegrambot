@@ -195,7 +195,7 @@ def operfirmware(message):
     a = cursor.execute(sql).fetchall()
     conn.close()
     if a:
-    for row in a:
+        for row in a:
             b = types.InlineKeyboardButton(text=row[0], url=row[1])
             markup.add(b)
         bot.send_message(message.chat.id, "Выберите прошивку для RedBox Mini 3L:", reply_markup=markup)
