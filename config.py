@@ -28,3 +28,5 @@ class States(Enum):
     P_REDBOX5PRO_APP = "21"
     T_SUPPORT_MSG = "30"
     ADMIN_CMD_READY = "123"
+    NOT_AUTH_USER = "N"
+    WAIT_AUTH_APPROVE = "W"

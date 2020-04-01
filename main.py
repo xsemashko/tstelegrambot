@@ -22,37 +22,59 @@ password = config.E_PASSWD
 @bot.message_handler(commands=['start'])
 @bot.message_handler(regexp="^Вернуться в главное меню.$")
 def welcome(message):
-    FILEID = 'BAACAgIAAxkDAAIBxl5lH2r1r05dKYn6CzQlrGMZVmvkAAIrBwAC81coSwEmYV_wTwp4GAQ'
-    
-# keyboard
-    markup = types.ReplyKeyboardMarkup(row_width=2)
-    item1 = types.KeyboardButton("Прошивки")
-    item2 = types.KeyboardButton("Техническая документация")
-    item3 = types.KeyboardButton("Программы и утилиты")
-    item4 = types.KeyboardButton("Приложения и кинотеатры")
-    item5 = types.KeyboardButton("Удаленное управление")
-    item6 = types.KeyboardButton("Техническая поддержка")
-    item7 = types.KeyboardButton("Приобрести оборудование")
-    item8 = types.KeyboardButton("Тестирование")
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    sql = "SELECT * FROM user_role_schm where user_id = '{0}' and access not null".format(message.from_user.id)
+    a = cursor.execute(sql).fetchone()
+    conn.close()
+    if a:
+        FILEID = 'BAACAgIAAxkDAAIBxl5lH2r1r05dKYn6CzQlrGMZVmvkAAIrBwAC81coSwEmYV_wTwp4GAQ'
+        markup = types.ReplyKeyboardMarkup(row_width=2)
+        item1 = types.KeyboardButton("Прошивки")
+        item2 = types.KeyboardButton("Техническая документация")
+        item3 = types.KeyboardButton("Программы и утилиты")
+        item4 = types.KeyboardButton("Приложения и кинотеатры")
+        item5 = types.KeyboardButton("Удаленное управление")
+        item6 = types.KeyboardButton("Техническая поддержка")
+        item7 = types.KeyboardButton("Приобрести оборудование")
+        item8 = types.KeyboardButton("Тестирование")
+        markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
+        bot.send_video(message.chat.id, FILEID, reply_markup=markup)
+        dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
+    else:
+        if dbworker.get_current_state(message.chat.id) == config.States.WAIT_AUTH_APPROVE.value:
+    	    bot.send_message(message.chat.id, "Ваш запрос еще не был обработан, пожалуйста ожидайте, через некоторое время попробуйте отправить команду /start")
+        else:
+            dbworker.set_state(message.chat.id, config.States.NOT_AUTH_USER.value)
+            bot.send_message(message.chat.id, "Здравствуйте. Вы видите данное сообщение так как не имеете прав на доступ к боту. Для получения доступа, пожалуйста, пришлите одним сообщением ваши ФИО, название организации и номер телефона для связи.")
+            bot.send_message(message.chat.id,"Также Вы можете задать нам вопрос отправив его одним сообщением")
 
-    markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
-    
-    bot.send_video(message.chat.id, FILEID, reply_markup=markup)
-    dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.NOT_AUTH_USER.value)
+def auth_request(message):
+    text = "USER_ID = " + str(message.from_user.id) + "\n" + message.text
+    messageemail = MIMEMultipart("alternative")
+    messageemail["Subject"] = "Запрос на авторизацию от USER_ID " + str(message.from_user.id)
+    messageemail["From"] = sender_email
+    messageemail["To"] = receiver_email
+    part1 = MIMEText(text, "plain")
+    messageemail.attach(part1)
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, messageemail.as_string())
+    bot.send_message(message.chat.id, "Ваш запрос отправлен, через некоторое время попробуйте отправить команду /start")
+    dbworker.set_state(message.chat.id, config.States.WAIT_AUTH_APPROVE.value)
 
 @bot.message_handler(regexp="^Прошивки$")
 def software(message):
 
-# keyboard
     markup1 = types.ReplyKeyboardMarkup(row_width=2)
     item1 = types.KeyboardButton("Порталы и платформы")
     item2 = types.KeyboardButton("Прошивки для операторов")
     item3 = types.KeyboardButton("Стоковая прошивка")
     item4 = types.KeyboardButton("Кастомизация")
     item5 = types.KeyboardButton("Назад в гл.меню")
-
     markup1.add(item1, item2, item3, item4, item5)
-
     bot.send_message(message.chat.id, "Выберите интересующую категорию", reply_markup=markup1)
     pass
 
@@ -696,7 +718,8 @@ def cmd_admin_get_role(message):
     else:
         bot.send_message(message.chat.id, "Пользователь не добавлен, вероятно он уже существует")
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
-        welcome(message)	
+        welcome(message)
+        conn.close()	
 #Конец блока кастомизации
 # RUN
 bot.polling(none_stop=True)
