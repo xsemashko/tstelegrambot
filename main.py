@@ -11,6 +11,7 @@ import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sqlite3
+import re
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -663,6 +664,39 @@ def cmd_get_usr_data(message):
 	    bot.send_message(message.chat.id, message.from_user.id)
 	else:
 		bot.send_message(message.chat.id, "No DATA about user")
+
+@bot.message_handler(commands=['getroles'])
+def cmd_admin(message):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    sql = "SELECT * from user_role_schm where user_id = '{0}' and access = 'admin'".format(message.from_user.id)
+    a = cursor.execute(sql).fetchone()
+    conn.close()
+    if a:
+        dbworker.set_state(message.chat.id, config.States.ADMIN_CMD_READY.value)
+        bot.send_message(message.chat.id, "Вы можете добавить права пользователю, для этого пришлите команду типа: user_id Донтехсвязь")
+    else:
+        bot.send_message(message.chat.id, "У Вас недостаточно прав для выполнения данной команды")
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.ADMIN_CMD_READY.value)
+def cmd_admin_get_role(message):
+    a = re.split("( )", message.text, 1)
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    sql1 = "SELECT * from user_role_schm where user_id = '{0}'".format(a[0])
+    b = cursor.execute(sql1).fetchone()
+    if not b:
+        sql2 = "INSERT INTO user_role_schm (user_id, access) VALUES ('{0}', '{1}')".format(a[0], a[2])
+        cursor.execute(sql2)
+        conn.commit()
+        conn.close()
+        bot.send_message(message.chat.id, "Пользователь добавлен")
+        dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
+        welcome(message)
+    else:
+        bot.send_message(message.chat.id, "Пользователь не добавлен, вероятно он уже существует")
+        dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
+        welcome(message)	
 #Конец блока кастомизации
 # RUN
 bot.polling(none_stop=True)

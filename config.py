@@ -27,3 +27,4 @@ class States(Enum):
     P_REDBOX3L_APP = "20"
     P_REDBOX5PRO_APP = "21"
     T_SUPPORT_MSG = "30"
+    ADMIN_CMD_READY = "123"
