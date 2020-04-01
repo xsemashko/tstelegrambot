@@ -189,33 +189,32 @@ def operfirmware(message):
 @bot.message_handler(regexp="^RedBox Mini 3L:$")
 def operfirmware(message):
     markup = types.InlineKeyboardMarkup(row_width=1)
-    item1 = types.InlineKeyboardButton(text="Донтехсвязь - Кабель", url="http://217.21.59.159/Data/Firmware/H3s/d/dontech/h3s-dontech-20200221-d.7z")
-    item2 = types.InlineKeyboardButton(text="Донтехсвязь - Флешка", url="http://217.21.59.159/Data/Firmware/H3s/d/dontech/h3s-dontech-20200221-ota-d.zip")
-    item3 = types.InlineKeyboardButton(text="Ellco - Кабель", url="http://217.21.59.159/Data/Firmware/H3s/d/Ellco/h3s-ellco-20191224-d.7z")
-    item4 = types.InlineKeyboardButton(text="Ellco - Флешка", url="http://217.21.59.159/Data/Firmware/H3s/d/Ellco/h3s-ellco-20191224-ota-d.zip")
-    item5 = types.InlineKeyboardButton(text="Лига Телеком - Кабель", url="http://217.21.59.159/Data/Firmware/H3s/d/liga/h3s-liga-20200205-d.7z")
-    item6 = types.InlineKeyboardButton(text="Метросеть - Кабель", url="http://217.21.59.159/Data/Firmware/H3s/d/metroset/h3s-metroset-20200218-d.7z")
-    item7 = types.InlineKeyboardButton(text="Метросеть - Флешка", url="http://217.21.59.159/Data/Firmware/H3s/d/metroset/h3s-metroset-20200218-ota-d.zip")
-    item8 = types.InlineKeyboardButton(text="Миранда Медиа - Кабель", url="http://217.21.59.159/Data/Firmware/H3s/d/miranda/h3s-miranda-20200114-d.7z")
-    markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    sql = "SELECT links_l.oper_name, links_l.link_name FROM links_l, user_role_schm WHERE links_l.vendor = 'RedBox Mini 3L' and links_l.access_name like '%'||user_role_schm.access||'%' and user_role_schm.user_id = '{0}'".format(message.from_user.id)
+    a = cursor.execute(sql).fetchall()
+    conn.close()
+    for row in a:
+        b = types.InlineKeyboardButton(text=row[0], url=row[1])
+        markup.add(b)
     bot.send_message(message.chat.id, "Выберите прошивку для RedBox Mini 3L:", reply_markup=markup)
+    
 
 @bot.message_handler(regexp="^RedBox Mini 5PRO:$")
 def operfirmware(message):
     markup = types.InlineKeyboardMarkup(row_width=1)
-    item1 = types.InlineKeyboardButton(text="Клиент Флекс - Кабель", url="http://217.21.59.159/Data/Firmware/H5s/d/flex/h5s-flex-20200227-d.7z")
-    item2 = types.InlineKeyboardButton(text="ИС-Телеком - Кабель", url="http://217.21.59.159/Data/Firmware/H5s/d/is/h5s-is24-20200228-d.7z")
-    item3 = types.InlineKeyboardButton(text="ИС-Телеком - Флешка", url="http://217.21.59.159/Data/Firmware/H5s/d/is/h5s-is24-20200228-ota-d.zip")
-    item4 = types.InlineKeyboardButton(text="АйТВ - Кабель", url="http://217.21.59.159/Data/Firmware/H5s/d/itv/h5s-itv-20200228-d.7z")
-    item5 = types.InlineKeyboardButton(text="АйТВ - Флешка", url="http://217.21.59.159/Data/Firmware/H5s/d/itv/h5s-itv-20200228-ota-d.zip")
-    item6 = types.InlineKeyboardButton(text="Ловител - Кабель", url="http://217.21.59.159/Data/Firmware/H5s/d/lovit/h5s-lovit-20200313-d.7z")
-    item7 = types.InlineKeyboardButton(text="Ловител - Флешка", url="http://217.21.59.159/Data/Firmware/H5s/d/lovit/h5s-lovit-20200313-ota-d.zip")
-    item8 = types.InlineKeyboardButton(text="Марьино.нет - Кабель", url="http://217.21.59.159/Data/Firmware/H5s/d/marino/h5s-marino-20200116-d.7z")
-    item9 = types.InlineKeyboardButton(text="Марьино.нет - Флешка", url="http://217.21.59.159/Data/Firmware/H5s/d/marino/h5s-marino-20200116-ota-d.zip")
-    item10 = types.InlineKeyboardButton(text="Меганет - Кабель", url="http://217.21.59.159/Data/Firmware/H5s/d/meganet/h5s-meganet-20200117-d.7z")
-    item11= types.InlineKeyboardButton(text="Меганет - Флешка", url="http://217.21.59.159/Data/Firmware/H5s/d/meganet/h5s-meganet-20200117-ota-d.zip")
-    markup.add(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11)
-    bot.send_message(message.chat.id, "Выберите прошивку для RedBox Mini 5PRO:", reply_markup=markup)
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    sql = "SELECT links_l.oper_name, links_l.link_name FROM links_l, user_role_schm WHERE links_l.vendor = 'RedBox Mini 5PRO' and links_l.access_name like '%'||user_role_schm.access||'%' and user_role_schm.user_id = '{0}'".format(message.from_user.id)
+    a = cursor.execute(sql).fetchall()
+    conn.close()
+    if a:
+        for row in a:
+            b = types.InlineKeyboardButton(text=row[0], url=row[1])
+            markup.add(b)
+        bot.send_message(message.chat.id, "Выберите прошивку для RedBox Mini 5PRO:", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, "К сожадению для Вас не найдено прошивок, либо у Вас недостаточно прав доступа")
 
 #Блок Техническая документация
 @bot.message_handler(regexp="^Техническая документация$")
@@ -656,7 +655,7 @@ def cmd_reset(message):
     dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
     welcome(message)
 
-@bot.message_handler(commands=['getuserdata'])
+@bot.message_handler(commands=['getuserid'])
 def cmd_get_usr_data(message):
 	if message.from_user.id:
 	    bot.send_message(message.chat.id, message.from_user.id)
