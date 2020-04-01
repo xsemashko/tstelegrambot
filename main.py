@@ -194,11 +194,13 @@ def operfirmware(message):
     sql = "SELECT links_l.oper_name, links_l.link_name FROM links_l, user_role_schm WHERE links_l.vendor = 'RedBox Mini 3L' and links_l.access_name like '%'||user_role_schm.access||'%' and user_role_schm.user_id = '{0}'".format(message.from_user.id)
     a = cursor.execute(sql).fetchall()
     conn.close()
+    if a:
     for row in a:
-        b = types.InlineKeyboardButton(text=row[0], url=row[1])
-        markup.add(b)
-    bot.send_message(message.chat.id, "Выберите прошивку для RedBox Mini 3L:", reply_markup=markup)
-    
+            b = types.InlineKeyboardButton(text=row[0], url=row[1])
+            markup.add(b)
+        bot.send_message(message.chat.id, "Выберите прошивку для RedBox Mini 3L:", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, "К сожадению для Вас не найдено прошивок, либо у Вас недостаточно прав доступа")    
 
 @bot.message_handler(regexp="^RedBox Mini 5PRO:$")
 def operfirmware(message):
