@@ -124,7 +124,7 @@ def redboxminil(message):
     item3 = types.KeyboardButton("СМОТРЕШКА")
     item4 = types.KeyboardButton("MOOVI TV")
     item5 = types.KeyboardButton("MICROIMPULS")
-    item6 = types.KeyboardButton("PEERS TV")
+    item6 = types.KeyboardButton("SMARTY")
     item7 = types.KeyboardButton("Назад в Порталы и платформы")
     markup.add(item1, item2, item3, item4, item5, item6, item7)
     bot.send_message(message.chat.id, "Выберите приложение:", reply_markup=markup)
@@ -137,7 +137,7 @@ def cmd_choose_appforl(message):
         portalsandplatforms(message)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
     elif message.text == "IPTVPORTAL":
-        bot.send_message(message.chat.id, "IPTVPORTAL Автозупуск Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://www.example.com/">inline URL</a>', parse_mode='html')
         bot.send_message(message.chat.id, "IPTVPORTAL Лаунчер Файл рар")
     elif message.text == "24 ТВ":
         bot.send_message(message.chat.id, "24 ТВ Автозупуск Файл рар")
@@ -161,23 +161,22 @@ def cmd_choose_appforl(message):
         portalsandplatforms(message)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
     elif message.text == "IPTVPORTAL":
-        bot.send_message(message.chat.id, "2IPTVPORTAL Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "2IPTVPORTAL Лаунчер Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/iptv/h5s-iptv-20191205-d.7z">IPTVPORTAL - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/iptv/h5s-iptv-20191205-ota-d.zip">IPTVPORTAL - Флешка</a>', parse_mode='html')
     elif message.text == "24 ТВ":
         bot.send_message(message.chat.id, "224 ТВ Автозупуск Файл рар")
         bot.send_message(message.chat.id, "224 ТВ Лаунчер Файл рар")
     elif message.text == "СМОТРЕШКА":
-        bot.send_message(message.chat.id, "2СМОТРЕШКА Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "2СМОТРЕШКА Лаунчер Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/h5s-smo-20190504-test.7z">СМОТРЕШКА</a>', parse_mode='html')
     elif message.text == "MOOVI TV":
-        bot.send_message(message.chat.id, "2MOOVI TV Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "2MOOVI TV Лаунчер Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/moovi/h5s-moovi-20191219-d.7z">MOOVI TV - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/moovi/h5s-moovi-20191219-ota-d.zip">MOOVI TV - Флешка</a>', parse_mode='html')
     elif message.text == "MICROIMPULS":
         bot.send_message(message.chat.id, "2MICROIMPULS Автозупуск Файл рар")
         bot.send_message(message.chat.id, "2MICROIMPULS Лаунчер Файл рар")
-    elif message.text == "PEERS TV":
-        bot.send_message(message.chat.id, "2PEERS TV Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "2PEERS TV Лаунчер Файл рар")
+    elif message.text == "SMARTY":
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/redbox/h5s-redbox-20200323-d.7z">SMARTY - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/redbox/h5s-redbox-20200323-ota-d.zip">SMARTY - Флешка</a>', parse_mode='html')
 
 @bot.message_handler(regexp="^Кастомизация$")
 def customizemenu(message):
