@@ -109,7 +109,7 @@ def redboxminil(message):
     item3 = types.KeyboardButton("СМОТРЕШКА")
     item4 = types.KeyboardButton("MOOVI TV")
     item5 = types.KeyboardButton("MICROIMPULS")
-    item6 = types.KeyboardButton("PEERS TV")
+    item6 = types.KeyboardButton("SMARTY")
     item7 = types.KeyboardButton("Назад в Порталы и платформы")
     markup.add(item1, item2, item3, item4, item5, item6, item7)
     bot.send_message(message.chat.id, "Выберите приложение:", reply_markup=markup)
@@ -137,23 +137,23 @@ def cmd_choose_appforl(message):
         portalsandplatforms(message)
         dbworker.set_state(message.chat.id, config.States.S_DISABLED.value)
     elif message.text == "IPTVPORTAL":
-        bot.send_message(message.chat.id, '<a href="http://www.example.com/">inline URL</a>', parse_mode='html')
-        bot.send_message(message.chat.id, "IPTVPORTAL Лаунчер Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/iptv/h3s-iptv-20191205-d.7z">IPTVPORTAL - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/iptv/h3s-iptv-20191205-ota-d.zip">IPTVPORTAL - Флешка</a>', parse_mode='html')
     elif message.text == "24 ТВ":
         bot.send_message(message.chat.id, "24 ТВ Автозупуск Файл рар")
         bot.send_message(message.chat.id, "24 ТВ Лаунчер Файл рар")
     elif message.text == "СМОТРЕШКА":
-        bot.send_message(message.chat.id, "СМОТРЕШКА Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "СМОТРЕШКА Лаунчер Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/smotr/h3s-smotr-20200303-d.7z">СМОТРЕШКА - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/smotr/h3s-smotr-20200303-ota-d.zip">СМОТРЕШКА - Флешка</a>', parse_mode='html')
     elif message.text == "MOOVI TV":
-        bot.send_message(message.chat.id, "MOOVI TV Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "MOOVI TV Лаунчер Файл рар")
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/moovi/h3s-moovi-20191219-d.7z">MOOVI TV - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/moovi/h3s-moovi-20191219-ota-d.zip">MOOVI TV - Флешка</a>', parse_mode='html')
     elif message.text == "MICROIMPULS":
         bot.send_message(message.chat.id, "MICROIMPULS Автозупуск Файл рар")
         bot.send_message(message.chat.id, "MICROIMPULS Лаунчер Файл рар")
-    elif message.text == "PEERS TV":
-        bot.send_message(message.chat.id, "PEERS TV Автозупуск Файл рар")
-        bot.send_message(message.chat.id, "PEERS TV Лаунчер Файл рар")
+    elif message.text == "SMARTY":
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/redbox/h3s-redbox-20191203-d.rar">SMARTY - Кабель</a>', parse_mode='html')
+        bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/redbox/h3s-redbox-20191203-ota-d.zip">SMARTY - Флешка</a>', parse_mode='html')
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.P_REDBOX5PRO_APP.value)
 def cmd_choose_appforl(message):
@@ -198,6 +198,17 @@ def stockfirmware(message):
     #тут надо будет заменить на инлайн
     markup.add(item1, item2, item3)
     bot.send_message(message.chat.id, "Выберите устройство:", reply_markup=markup)
+
+@bot.message_handler(regexp="^RedBox Mini 3L...$")
+def stockfirmware(message):
+    bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/redbox/h3s-redbox-20191203-d.rar">RedBox Mini 3L - Кабель</a>', parse_mode='html')
+    bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H3s/d/redbox/h3s-redbox-20191203-ota-d.zip">RedBox Mini 3L - Флешка</a>', parse_mode='html')
+
+@bot.message_handler(regexp="^RedBox Mini 5PRO...$")
+def stockfirmware(message):
+    bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/redbox/h5s-redbox-20200323-d.7z">RedBox Mini 5PRO - Кабель</a>', parse_mode='html')
+    bot.send_message(message.chat.id, '<a href="http://217.21.59.159/Firmware/H5s/d/redbox/h5s-redbox-20200323-ota-d.zip">RedBox Mini 5PRO - Флешка</a>', parse_mode='html')
+
 
 @bot.message_handler(regexp="^Прошивки для операторов$")
 def operfirmware(message):
